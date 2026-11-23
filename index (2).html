@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Bilim - курс SQL</title>
+<style>
+:root { --blue:#9274bd; --dark:#302b3e; --text:#3e354d; --muted:#718096; --border:#e9e1f0; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:#faf8fd; color:var(--text); font-family:'Nunito','Trebuchet MS',Arial,sans-serif; }
+button,select,textarea { font:inherit; }
+button,summary { cursor:pointer; }
+a { color:var(--blue); }
+button:focus-visible,a:focus-visible,textarea:focus-visible { outline:3px solid #c7b2e5; outline-offset:3px; }
+header { background:white; border-bottom:1px solid var(--border); }
+.header-inner { max-width:1200px; margin:auto; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+.logo { text-decoration:none; color:var(--blue); font-size:25px; font-weight:bold; white-space:nowrap; }
+.logo span { color:var(--text); }
+.logo { display:inline-flex; align-items:center; gap:9px; }
+.logo-star { width:29px; height:29px; flex:none; color:#a88acb; filter:drop-shadow(0 2px 3px #c9b5df80); }
+nav { display:flex; flex-wrap:wrap; gap:22px; }
+nav a { color:#796a87; text-decoration:none; font-size:14px; }
+nav a:hover { color:var(--blue); }
+.container { max-width:1200px; margin:auto; padding:32px 24px; }
+.hero { background:#f1eaf9; border:1px solid #e7ddf2; padding:40px; border-radius:22px; display:grid; grid-template-columns:1.2fr 1fr; gap:35px; align-items:center; }
+/* Большая декоративная звезда на фоне первого экрана */
+.hero { position:relative; isolation:isolate; overflow:hidden; }
+.hero::before { content:""; position:absolute; width:420px; height:420px; right:4%; top:-115px; z-index:-1; pointer-events:none; background:linear-gradient(145deg,rgba(183,151,223,.34),rgba(219,201,244,.12)); clip-path:polygon(50% 0%,62% 37%,100% 50%,62% 63%,50% 100%,38% 63%,0% 50%,38% 37%); transform:rotate(-13deg); }
+.hero > * { position:relative; z-index:1; }
+@media(max-width:700px) { .hero::before { width:280px; height:280px; right:-65px; top:-50px; } }
+.badge { display:inline-block; padding:8px 12px; border-radius:20px; background:white; color:var(--blue); font-size:11px; font-weight:bold; letter-spacing:.5px; }
+h1 { font-size:42px; line-height:1.15; margin:20px 0; letter-spacing:-1px; }
+.hero p { color:#7a6c89; line-height:1.8; }
+.primary,.secondary { display:inline-block; padding:12px 18px; border-radius:9px; font-weight:bold; }
+.primary { background:var(--blue); color:white; border:1px solid var(--blue); }
+.primary:hover { background:#7e61aa; }
+.secondary { border:1px solid var(--border); background:white; color:#71617f; }
+button:disabled { opacity:.45; cursor:default; }
+.stats { display:flex; flex-wrap:wrap; gap:18px; margin-top:25px; color:#7a6c89; font-size:13px; }
+.hero-code { background:var(--dark); border-radius:16px; padding:25px; color:#e8dbf7; }
+.hero-code pre { line-height:1.9; white-space:pre-wrap; margin-bottom:0; }
+.window-dots { color:#baa6d0; letter-spacing:6px; }
+.section { margin-top:32px; scroll-margin-top:20px; }
+.layout { display:grid; grid-template-columns:285px minmax(0,1fr); gap:24px; }
+.card { background:white; border:1px solid var(--border); border-radius:16px; padding:25px; min-width:0; }
+h2 { font-size:25px; margin:0 0 12px; }
+h3 { margin:0 0 10px; font-size:17px; }
+.muted { color:var(--muted); font-size:13px; line-height:1.7; }
+.progress-track { height:7px; background:#eee7f5; border-radius:8px; margin:18px 0 8px; }
+.progress-fill { height:100%; background:var(--blue); border-radius:8px; transition:width .3s; }
+.lesson-list { display:grid; gap:6px; margin-top:20px; }
+.lesson-button { display:flex; gap:11px; align-items:center; border:0; background:transparent; color:#71617f; padding:12px 10px; text-align:left; border-radius:10px; width:100%; }
+.lesson-button:hover { background:#faf8fd; }
+.lesson-button.active { background:#f3edfa; color:var(--blue); }
+.lesson-number { display:grid; place-items:center; flex-shrink:0; width:28px; height:28px; background:#eef1f6; border-radius:8px; font-size:12px; }
+.lesson-button.active .lesson-number { background:var(--blue); color:white; }
+.lesson-button.done .lesson-number { background:#e2f6eb; color:#138057; }
+.lesson-button small { display:block; margin-top:5px; color:#8793a5; font-size:11px; }
+.breadcrumb { color:var(--muted); font-size:12px; margin-bottom:16px; }
+.tabs { display:flex; gap:25px; border-bottom:1px solid var(--border); margin-bottom:25px; }
+.tab { border:0; background:none; color:var(--muted); padding:13px 0; }
+.tab.active { border-bottom:2px solid var(--blue); color:var(--blue); }
+.lesson-label { color:var(--blue); font-size:11px; font-weight:bold; letter-spacing:.6px; }
+.lesson-title { margin-top:14px; font-size:28px; }
+.theory { line-height:1.85; color:#71617f; }
+.theory h3 { color:#49395f; margin:24px 0 8px; font-size:19px; }
+.theory p { margin:12px 0; }
+.code-block { padding:20px; background:var(--dark); color:#eadff7; border-radius:10px; line-height:1.7; overflow:auto; font-size:13px; tab-size:2; }
+.notice { background:#f4effa; border-radius:10px; padding:16px; line-height:1.7; font-size:14px; }
+.actions { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:25px; }
+.option { display:block; width:100%; background:white; border:1px solid var(--border); border-radius:10px; padding:15px; margin-top:12px; text-align:left; color:var(--text); }
+.option:hover,.option.selected { border-color:var(--blue); background:#f4effa; }
+.feedback { padding:14px; margin-top:18px; border-radius:10px; line-height:1.7; }
+.feedback:empty { display:none; }
+.success { background:#e9f8ef; color:#16724e; }
+.error { background:#fff0f0; color:#a63a3a; }
+.section-head { display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; margin-bottom:20px; }
+.section-head p { margin:0; }
+.schema { background:#f4effa; padding:20px; border-radius:12px; line-height:1.8; }
+.schema code { overflow-wrap:anywhere; }
+.schema summary { color:var(--blue); }
+.practice-toolbar { display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; }
+.filter { padding:9px 15px; border-radius:20px; background:white; color:#71617f; border:1px solid var(--border); }
+.filter.active { background:var(--blue); color:white; border-color:var(--blue); }
+.task-card { border: 1px solid var(--border); padding: 22px; border-radius: 13px; margin-top: 16px; }
+.task-heading { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.task-card h3 { margin-top: 15px; }
+.task-card p { color: #71617f; line-height: 1.7; }
+.level { font-size: 11px; color: var(--blue); background: #f3edfa; padding: 6px 10px; border-radius: 15px; }
+.task-editor {
+  width: 100%;
+  display: block;
+  min-height: 115px;
+  margin-top: 8px;
+  padding: 15px;
+  background: var(--dark);
+  border: 1px solid #3c4b63;
+  color: #eadff7;
+  border-radius: 10px;
+  resize: vertical;
+  font: 14px/1.7 monospace;
+}
+.task-card details { margin-top: 16px; }
+.task-card summary { color: var(--blue); font-size: 14px; }
+.task-complete { display: flex; gap: 9px; align-items: center; margin-top: 20px; color: #71617f; font-size: 14px; }
+.task-complete input { width: 18px; height: 18px; accent-color: var(--blue); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 16px 0; }
+th, td { padding: 11px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: #faf8fd; }
+footer { padding: 30px 24px; text-align: center; color: var(--muted); font-size: 13px; }
+.hidden { display: none !important; }
+@media (max-width: 850px) {
+  .hero, .layout { grid-template-columns: 1fr; }
+  .header-inner { align-items: flex-start; flex-direction: column; }
+  .lesson-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  h1 { font-size: 35px; }
+}
+@media (max-width: 600px) {
+  .container { padding: 20px 14px; }
+  .hero { padding: 25px; }
+  .card { padding: 20px; }
+  nav { gap: 15px; }
+  .lesson-title { font-size: 24px; }
+  .task-card { padding: 16px; }
+}
+.expected-result { white-space: pre-line; }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+body { font-weight: 500; }
+h1,h2,h3,.logo { font-weight: 800; letter-spacing: -0.35px; }
+button,select,textarea { font-family: inherit; }
+
+/* Помощник курса */
+#sqlAiToggle{position:fixed;right:22px;bottom:22px;z-index:50;border:0;border-radius:28px;background:#9274bd;color:white;padding:14px 20px;box-shadow:0 8px 26px #6b4b9250;font-weight:800}
+#sqlAiPanel{position:fixed;right:22px;bottom:84px;width:min(380px,calc(100vw - 28px));height:min(530px,calc(100dvh - 115px));background:white;border:1px solid #e9e1f0;border-radius:19px;z-index:51;box-shadow:0 14px 55px #302b3e30;display:flex;flex-direction:column;overflow:hidden}
+#sqlAiPanel[hidden]{display:none} .ai-head{background:#f1eaf9;padding:17px;display:flex;justify-content:space-between;align-items:center}.ai-head strong{color:#65488a}.ai-head button{background:transparent;border:0;font-size:23px;color:#65488a}.ai-messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:11px}.ai-bubble{padding:11px 13px;border-radius:13px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:13px;max-width:94%}.ai-bot{background:#f4effa;align-self:flex-start}.ai-user{background:#9274bd;color:white;align-self:flex-end}.ai-input-row{padding:12px;display:flex;gap:7px;border-top:1px solid #e9e1f0}.ai-input-row input{flex:1;min-width:0;border:1px solid #e9e1f0;border-radius:9px;padding:10px;font:inherit}.ai-input-row button{border:0;border-radius:9px;background:#9274bd;color:white;padding:9px 13px}.ai-foot{font-size:11px;color:#867b92;padding:0 13px 11px}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#" aria-label="SQL Bilim - главная"><svg class="logo-star" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M16 2.5 19.7 12.3 29.5 16 19.7 19.7 16 29.5 12.3 19.7 2.5 16 12.3 12.3Z" fill="#b69ad8" stroke="#9274bd" stroke-width="1.2" stroke-linejoin="round"/><circle cx="16" cy="16" r="2.4" fill="#f7f0ff"/></svg>SQL<span> Bilim</span></a>
+    <nav aria-label="Основная навигация">
+      <a href="#course">Обучение</a>
+      <a href="#course">Текстовые лекции</a>
+      <a href="#practice">Практика</a>
+      <a href="#database">Учебная база</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div>
+      <span class="badge">ОТКРЫТЫЙ КУРС ДЛЯ НАЧИНАЮЩИХ</span>
+      <h1>Твой первый шаг<br>в мир SQL</h1>
+      <p>
+        Изучай базы данных в своём темпе.
+        Читай лекции, смотри видео преподавателей
+        и закрепляй знания на практических заданиях.
+      </p>
+      <button class="primary" id="startButton">Начать обучение →</button>
+      <div class="stats">
+        <span>10 уроков</span>
+        <span>50 вопросов в тестах</span>
+        <span>18 заданий</span>
+      </div>
+    </div>
+    <div class="hero-code">
+      <div class="window-dots">●●●</div>
+      <pre><span style="color:#cfb4ed">SELECT</span> knowledge, skills
+<span style="color:#cfb4ed">FROM</span> your_future
+<span style="color:#cfb4ed">WHERE</span> practice = 'every day';
+
+<span style="color:#73d6ae">-- Всё начинается с первого запроса</span></pre>
+    </div>
+  </section>
+
+  <section class="layout section" id="course">
+    <aside class="card">
+      <h3>Программа курса</h3>
+      <p class="muted">От первых запросов до подзапросов</p>
+      <div class="progress-track">
+        <div class="progress-fill" id="lessonProgress"></div>
+      </div>
+      <div class="muted" id="lessonProgressText"></div>
+      <div class="lesson-list" id="lessonList"></div>
+    </aside>
+
+    <article class="card">
+      <div class="breadcrumb">Мой курс / Основы SQL</div>
+
+      <div class="tabs">
+        <button class="tab active" id="theoryTab">Лекция</button>
+        <button class="tab" id="quizTab">Проверка знаний</button>
+      </div>
+
+      <div id="theoryPanel">
+        <span class="lesson-label" id="lessonLabel"></span>
+        <h2 class="lesson-title" id="lessonTitle"></h2>
+        <div class="theory" id="lessonTheory"></div>
+        <pre class="code-block" id="lessonExample"></pre>
+        <div class="notice" id="lessonNote"></div>
+        <div class="actions">
+          <button class="secondary" id="previousButton">← Предыдущий урок</button>
+          <button class="primary" id="goQuizButton">Перейти к тесту →</button>
+        </div>
+      </div>
+
+      <div id="quizPanel" class="hidden">
+        <span class="lesson-label">ПРОВЕРКА ЗНАНИЙ</span>
+        <h2 class="lesson-title" id="quizQuestion"></h2>
+        <p class="muted">Выбери один правильный ответ.</p>
+        <div id="quizOptions"></div>
+        <div id="quizFeedback" role="status" aria-live="polite"></div>
+        <div class="actions">
+          <button class="secondary" id="backTheoryButton">Повторить лекцию</button>
+          <button class="primary" id="checkButton">Проверить ответ</button>
+          <button class="primary hidden" id="nextButton">Следующий урок →</button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="card section" id="database">
+    <h2>Учебная база «Университет»</h2>
+    <p class="muted">
+      Все практические задания используют эти таблицы. Оценки и дополнительные записи - учебный пример.
+      Примеры рассчитаны на SQLite.
+    </p>
+
+    <div class="schema">
+      <strong>Структура таблиц</strong><br>
+      <code>students(id, name, age, city, grade, group_id)</code><br>
+      <code>groups(id, title)</code><br>
+      Поле <b>students.group_id</b> связано с <b>groups.id</b>.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>id</th><th>name</th><th>age</th>
+            <th>city</th><th>grade</th><th>group_id</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>id</th><th>title</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>АЖ-301</td></tr>
+          <tr><td>2</td><td>АЖ-301</td></tr>
+          <tr><td>3</td><td>АЖ-301</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details>
+      <summary>Показать SQL для создания и заполнения базы</summary>
+      <pre class="code-block" id="setupCode"></pre>
+    </details>
+  </section>
+
+  <section class="card section" id="practice">
+    <div class="section-head">
+      <div>
+        <h2>Практические задания</h2>
+        <p class="muted">Напиши запрос и сравни его с примером решения.</p>
+      </div>
+      <span class="badge" id="practiceCounter"></span>
+    </div>
+
+    <div class="notice">
+      Это тетрадь для самостоятельной практики:
+      запросы сохраняются в браузере, но здесь не выполняются.
+      Выполняй их в SQLite на учебной базе.
+      Каждое задание предполагает исходные данные:
+      для заданий на изменение используй отдельную копию базы.
+    </div>
+
+    <div class="practice-toolbar" id="practiceFilters"></div>
+    <div id="practiceList"></div>
+  </section>
+</main>
+
+<footer>SQL Bilim · Учебный проект по основам баз данных</footer>
+
+<button id="sqlAiToggle" type="button" aria-controls="sqlAiPanel" aria-expanded="false">✦ SQL AI</button>
+<section id="sqlAiPanel" aria-label="Помощник по курсу SQL" hidden>
+ <div class="ai-head"><div><strong>✦ SQL AI</strong><div class="muted">Помощник по материалам курса</div></div><button id="sqlAiClose" type="button" aria-label="Закрыть чат">×</button></div>
+ <div class="ai-messages" id="sqlAiMessages" aria-live="polite"><div class="ai-bubble ai-bot">Привет! Я помогу разобраться с лекциями, тестами и практикой SQL Bilim. Например, спроси: «Что такое JOIN?» или «Как решить задание про среднюю оценку?»</div></div>
+ <form class="ai-input-row" id="sqlAiForm"><input id="sqlAiInput" aria-label="Вопрос по SQL" placeholder="Спроси про SQL..." maxlength="500" required autocomplete="off"><button type="submit">➤</button></form>
+ <div class="ai-foot">Бесплатный офлайн-помощник. Ответы из материалов сайта, не ChatGPT.</div>
+</section>
+
+<script>
+"use strict";
+
+
+
+const lessons = [
+  {
+    title: "Знакомство с SQL",
+    time: "8 минут",
+    theory: `
+      <p><b>SQL</b> - язык для работы с реляционными базами данных.
+      Его используют для получения, добавления, изменения и удаления данных.</p>
+      <p>Реляционная база хранит информацию в таблицах.
+      Столбцы описывают свойства, а строки содержат отдельные записи.
+      Например, одна строка students - это один студент.</p>
+      <p>Система управления базами данных, или <b>СУБД</b>,
+      хранит данные и выполняет запросы.
+      Примеры СУБД: PostgreSQL, MySQL и SQLite.</p>
+      <p>SQL - язык, а SQLite - одна из систем, которая понимает этот язык.
+      Синтаксис разных СУБД может немного отличаться.</p>
+      <h3>Что такое база данных</h3>
+      <p>База данных нужна, когда информацию требуется не просто хранить, но и быстро находить, изменять и связывать. Например, в учебной системе можно отдельно хранить студентов и учебные группы. Это уменьшает повторение данных и облегчает обновление сведений.</p>
+      <p>Таблица students содержит столбцы id, name, age, city, grade, group_id. Столбец id обычно служит уникальным идентификатором строки, а group_id может указывать на другую таблицу.</p>
+      <p>SQL-команды принято разделять по назначению: DQL (чтение SELECT), DML (INSERT, UPDATE, DELETE), DDL (CREATE, ALTER, DROP). В SQLite команды можно писать в разных регистрах, но ключевые слова часто пишут заглавными для читаемости.</p>
+      <div class="notice"><b>Запомни:</b> Не путай базу данных и СУБД: база - набор данных, СУБД - программная система для работы с ними.</div>`,
+    example: "SELECT * FROM students;",
+    note: "Звёздочка * означает «выбрать все столбцы». FROM указывает таблицу.",
+    questions: [
+  {
+    "question": "Для чего используется SQL?",
+    "options": [
+      "Для обработки изображений",
+      "Для работы с базами данных",
+      "Для монтажа видео"
+    ],
+    "answer": 1,
+    "explanation": "SQL позволяет получать и изменять данные в базах данных."
+  },
+  {
+    "question": "Как хранятся данные в реляционной базе?",
+    "options": [
+      "В таблицах",
+      "Только в изображениях",
+      "Только в текстовых документах"
+    ],
+    "answer": 0,
+    "explanation": "Данные организованы в таблицы со строками и столбцами."
+  },
+  {
+    "question": "Что представляет собой строка таблицы students?",
+    "options": [
+      "Название базы данных",
+      "Отдельного студента",
+      "Название столбца"
+    ],
+    "answer": 1,
+    "explanation": "Одна строка содержит одну запись - сведения об одном студенте."
+  },
+  {
+    "question": "Что такое СУБД?",
+    "options": [
+      "Язык оформления сайта",
+      "Редактор фотографий",
+      "Система управления базами данных"
+    ],
+    "answer": 2,
+    "explanation": "СУБД хранит данные и выполняет запросы. Примеры: SQLite, PostgreSQL и MySQL."
+  },
+  {
+    "question": "Что делает SELECT * FROM students?",
+    "options": [
+      "Удаляет таблицу students",
+      "Добавляет студента",
+      "Выбирает все столбцы и строки таблицы students"
+    ],
+    "answer": 2,
+    "explanation": "SELECT получает данные, * выбирает все столбцы, FROM указывает таблицу."
+  }
+]
+  },
+  {
+    title: "Выборка: SELECT",
+    time: "10 минут",
+    theory: `
+      <p>Команда <b>SELECT</b> получает данные из таблицы.
+      После неё перечисляются нужные столбцы, после <b>FROM</b> - имя таблицы.</p>
+      <p>Столбцы разделяются запятыми.
+      Чтобы получить все столбцы, используется SELECT *.</p>
+      <p><b>DISTINCT</b> удаляет повторяющиеся строки из результата.
+      Например, SELECT DISTINCT city возвращает список городов без повторов.</p>
+      <p><b>AS</b> задаёт псевдоним столбцу результата.
+      Псевдоним не изменяет название столбца в исходной таблице.</p>
+      <h3>Столбцы и псевдонимы</h3>
+      <p>SELECT позволяет возвращать как отдельные столбцы, так и вычисляемые выражения. Например, SELECT name, grade + 5 AS bonus_grade FROM students создаст вычисляемый столбец в результате, не меняя данные в таблице.</p>
+      <p>DISTINCT устраняет дубликаты именно по всему набору выбранных столбцов. SELECT DISTINCT city, age вернёт уникальные сочетания города и возраста, а не только уникальные города.</p>
+      <p>Для читаемости длинного запроса SELECT, FROM и другие части обычно располагают на отдельных строках. Порядок столбцов в результате соответствует порядку перечисления после SELECT.</p>
+      <div class="notice"><b>Запомни:</b> Псевдоним AS действует на результат запроса и не переименовывает столбец в базе.</div>`,
+    example:
+`SELECT name, age
+FROM students;
+
+SELECT DISTINCT city
+FROM students;
+
+SELECT name AS student_name
+FROM students;`,
+    note: "SELECT не изменяет исходные данные - он возвращает результат запроса.",
+    question: "Как получить только имена студентов?",
+    options: [
+      "SELECT name FROM students;",
+      "SELECT students FROM name;",
+      "GET name IN students;"
+    ],
+    answer: 0,
+    explanation: "После SELECT указывается столбец name, после FROM - таблица students."
+  },
+  {
+    title: "Фильтрация: WHERE",
+    time: "12 минут",
+    theory: `
+      <p><b>WHERE</b> выбирает строки, соответствующие условию.
+      Например, age &gt; 19 оставляет студентов старше 19 лет.</p>
+      <p>Операторы сравнения:
+      <b>=, &gt;, &lt;, &gt;=, &lt;=, &lt;&gt;</b>.
+      Текстовые значения записываются в одинарных кавычках.</p>
+      <p><b>AND</b> требует выполнения обоих условий.
+      <b>OR</b> требует выполнения хотя бы одного.
+      Для явного порядка проверки используй скобки.</p>
+      <p><b>IN</b> проверяет вхождение в список.
+      <b>IS NULL</b> ищет отсутствующие значения:
+      сравнение = NULL для этого не подходит.</p>
+      <h3>Сложные условия</h3>
+      <p>WHERE выполняет фильтрацию отдельных строк. Условие city = 'Павлодар' AND grade >= 90 выберет только студентов из Павлодара с оценкой от 90. Если использовать OR, достаточно одного совпадения.</p>
+      <p>BETWEEN 18 AND 20 включает обе границы. LIKE 'А%' ищет текст, начинающийся с буквы А; знак % обозначает любое количество символов, а _ - ровно один символ.</p>
+      <p>NULL означает отсутствие известного значения. Проверяй его через IS NULL или IS NOT NULL. Сравнения с NULL через = и <> не дают обычного результата true/false.</p>
+      <div class="notice"><b>Запомни:</b> Для сложных условий ставь скобки: AND имеет более высокий приоритет, чем OR.</div>`,
+    example:
+`SELECT *
+FROM students
+WHERE city = 'Астана' AND grade >= 80;
+
+SELECT *
+FROM students
+WHERE city IN ('Астана', 'Алматы');
+
+SELECT *
+FROM students
+WHERE group_id IS NULL;`,
+    note: "Условие age >= 18 включает возраст 18. Условие age > 18 - не включает.",
+    question: "Как найти студентов без указанной группы?",
+    options: [
+      "WHERE group_id = NULL",
+      "WHERE group_id IS NULL",
+      "WHERE group_id = 0"
+    ],
+    answer: 1,
+    explanation: "Отсутствующее значение NULL проверяется через IS NULL."
+  },
+  {
+    title: "Сортировка и LIMIT",
+    time: "10 минут",
+    theory: `
+      <p><b>ORDER BY</b> определяет порядок строк в результате.
+      <b>ASC</b> сортирует по возрастанию, <b>DESC</b> - по убыванию.
+      По умолчанию применяется ASC.</p>
+      <p>Можно указать несколько столбцов:
+      сначала выполняется сортировка по первому,
+      а при равных значениях - по следующему.</p>
+      <p><b>LIMIT</b> ограничивает число возвращаемых строк.
+      В SQLite он записывается после ORDER BY.</p>
+      <p>Чтобы получить три лучших результата,
+      сначала отсортируй оценки по убыванию, затем добавь LIMIT 3.</p>
+      <h3>Порядок вывода</h3>
+      <p>ORDER BY можно применять к числовым и текстовым столбцам. ORDER BY city ASC, grade DESC сначала упорядочит строки по городам, а внутри каждого города - по убыванию оценок.</p>
+      <p>LIMIT 5 оставляет не более пяти строк результата. OFFSET 5 позволяет пропустить первые пять строк, например при постраничном просмотре. Для устойчивой пагинации полезно включать уникальный id в сортировку.</p>
+      <p>Если несколько строк имеют одинаковые оценки, их взаимный порядок без дополнительного столбца не определён. Поэтому ORDER BY grade DESC, id ASC даёт более предсказуемый результат.</p>
+      <div class="notice"><b>Запомни:</b> LIMIT не гарантирует выбор именно лучших строк без подходящего ORDER BY.</div>`,
+    example:
+`SELECT name, grade
+FROM students
+ORDER BY grade DESC, id ASC
+LIMIT 3;`,
+    note: "Без ORDER BY порядок строк не гарантируется.",
+    question: "Как вывести сначала самые высокие оценки?",
+    options: [
+      "ORDER BY grade ASC",
+      "ORDER BY grade DESC",
+      "WHERE grade DESC"
+    ],
+    answer: 1,
+    explanation: "DESC сортирует значения от большего к меньшему."
+  },
+  {
+    title: "Агрегатные функции",
+    time: "12 минут",
+    theory: `
+      <p>Агрегатные функции вычисляют итоговые значения
+      по набору строк.</p>
+      <p><b>COUNT(*)</b> считает строки.
+      <b>COUNT(age)</b> считает строки, в которых age не равен NULL.</p>
+      <p><b>AVG</b> вычисляет среднее, <b>SUM</b> - сумму,
+      <b>MIN</b> - минимум, <b>MAX</b> - максимум.
+      Эти функции не учитывают NULL в обрабатываемом столбце.</p>
+      <p>WHERE можно использовать перед вычислением:
+      тогда функция обработает только подходящие строки.</p>
+      <h3>Подсчёты и статистика</h3>
+      <p>Агрегатные функции сводят множество строк к одному итоговому значению. COUNT(*) учитывает все строки, а COUNT(grade) - только строки с известной оценкой.</p>
+      <p>SUM(grade) вычисляет сумму, AVG(grade) - среднее арифметическое, MIN и MAX - минимальное и максимальное значения. Для среднего по конкретному городу добавь WHERE перед вычислением.</p>
+      <p>Если подходящих строк нет, COUNT(*) вернёт 0, а AVG и SUM обычно вернут NULL. Это важно учитывать при подготовке отчётов и отображении статистики.</p>
+      <div class="notice"><b>Запомни:</b> Для округления среднего значения в SQLite можно использовать ROUND(AVG(grade), 2).</div>`,
+    example:
+`SELECT COUNT(*) AS total,
+       AVG(grade) AS average_grade,
+       MIN(grade) AS minimum_grade,
+       MAX(grade) AS maximum_grade
+FROM students;`,
+    note: "AS помогает дать понятное название вычисленному столбцу.",
+    question: "Какая функция вычисляет среднюю оценку?",
+    options: ["COUNT(grade)", "AVG(grade)", "MAX(grade)"],
+    answer: 1,
+    explanation: "AVG(grade) возвращает среднее значение оценок."
+  },
+  {
+    title: "Группировка и HAVING",
+    time: "15 минут",
+    theory: `
+      <p><b>GROUP BY</b> объединяет строки с одинаковыми значениями
+      в группы. Агрегатные функции вычисляются для каждой группы отдельно.</p>
+      <p>Например, группировка по city позволяет посчитать
+      студентов отдельно для каждого города.</p>
+      <p><b>WHERE</b> отбирает строки до группировки.
+      <b>HAVING</b> отбирает получившиеся группы после вычислений.</p>
+      <p>Столбцы SELECT, которые не входят в агрегатные функции,
+      обычно нужно указывать в GROUP BY.</p>
+      <h3>Группы и отчёты</h3>
+      <p>GROUP BY полезен для отчётов: можно вычислить число студентов по каждому городу, среднюю оценку по группе или максимальную оценку в каждом городе. Каждая группа формируется из строк с одинаковым значением указанного поля.</p>
+      <p>Логический порядок обработки помогает не путаться: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT. WHERE проверяет исходные строки, HAVING - итоговые группы.</p>
+      <p>Пример: SELECT city, ROUND(AVG(grade), 1) AS avg_grade FROM students GROUP BY city HAVING COUNT(*) >= 2; показывает средние оценки городов, где не менее двух студентов.</p>
+      <div class="notice"><b>Запомни:</b> В HAVING допустимы условия с агрегатами, например HAVING AVG(grade) > 85.</div>`,
+    example:
+`SELECT city, COUNT(*) AS total
+FROM students
+GROUP BY city
+HAVING COUNT(*) >= 3
+ORDER BY total DESC;`,
+    note: "HAVING COUNT(*) >= 3 оставляет группы, содержащие минимум три строки.",
+    question: "Что фильтрует группы после GROUP BY?",
+    options: ["HAVING", "LIMIT", "DISTINCT"],
+    answer: 0,
+    explanation: "HAVING проверяет условия для результатов группировки."
+  },
+  {
+    title: "Объединение таблиц: JOIN",
+    time: "15 минут",
+    theory: `
+      <p><b>JOIN</b> соединяет данные из нескольких таблиц.
+      Условие соответствия строк указывается после <b>ON</b>.</p>
+      <p>В учебной базе students.group_id хранит идентификатор группы,
+      а groups.id - идентификатор записи в таблице групп.</p>
+      <p><b>INNER JOIN</b> возвращает только совпавшие строки.
+      <b>LEFT JOIN</b> сохраняет все строки левой таблицы.
+      Если справа совпадения нет, её столбцы содержат NULL.</p>
+      <p>Псевдонимы s и g сокращают запись имён таблиц.</p>
+      <h3>Связи между таблицами</h3>
+      <p>В реляционной модели связи часто строятся через первичные и внешние ключи. В таблице students поле group_id ссылается на id из groups. Это позволяет хранить название группы один раз.</p>
+      <p>INNER JOIN оставляет строки с совпадениями в обеих таблицах. LEFT JOIN оставляет все строки слева, а при отсутствии пары справа возвращает NULL в соответствующих столбцах.</p>
+      <p>При объединении таблиц с одинаковыми названиями полей указывай псевдонимы: s.id, g.id. Условие ON s.group_id = g.id определяет, какие записи соответствуют друг другу.</p>
+      <div class="notice"><b>Запомни:</b> Если связь задана неправильно, JOIN может вернуть лишние строки или не найти совпадений.</div>`,
+    example:
+`SELECT s.name, g.title
+FROM students AS s
+LEFT JOIN groups AS g
+  ON s.group_id = g.id;`,
+    note: "Для сохранения студентов без группы используй LEFT JOIN.",
+    question: "Как сохранить всех студентов, даже без группы?",
+    options: ["INNER JOIN", "LEFT JOIN", "ORDER BY"],
+    answer: 1,
+    explanation: "LEFT JOIN сохраняет все строки левой таблицы students."
+  },
+  {
+    title: "Создание таблиц",
+    time: "12 минут",
+    theory: `
+      <p><b>CREATE TABLE</b> создаёт таблицу.
+      Для каждого столбца задаются имя, тип данных и ограничения.</p>
+      <p><b>INTEGER</b> подходит для целых чисел,
+      <b>TEXT</b> - для текста.
+      В этом курсе используется синтаксис SQLite.</p>
+      <p><b>PRIMARY KEY</b> идентифицирует запись,
+      <b>NOT NULL</b> запрещает отсутствующее значение,
+      <b>UNIQUE</b> ограничивает повторения,
+      <b>CHECK</b> проверяет условие допустимости.</p>
+      <p><b>FOREIGN KEY</b> связывает данные с ключом другой таблицы.
+      В SQLite контроль внешних ключей включается командой
+      PRAGMA foreign_keys = ON для соединения.</p>
+      <h3>Структура и ограничения</h3>
+      <p>CREATE TABLE определяет схему таблицы: названия столбцов, типы и правила хранения. В SQLite распространены INTEGER, REAL, TEXT, BLOB и NUMERIC.</p>
+      <p>PRIMARY KEY определяет ключ записи. NOT NULL запрещает NULL, UNIQUE требует уникальности, CHECK проверяет выражение, а FOREIGN KEY задаёт связь между таблицами.</p>
+      <p>ALTER TABLE применяется для изменения структуры существующей таблицы, например добавления столбца. DROP TABLE удаляет таблицу вместе с её данными, поэтому его нужно использовать осторожно.</p>
+      <div class="notice"><b>Запомни:</b> В SQLite контроль внешних ключей обычно включают отдельно: PRAGMA foreign_keys = ON;</div>`,
+    example:
+`CREATE TABLE courses (
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  hours INTEGER CHECK (hours > 0)
+);`,
+    note: "PRIMARY KEY служит ключом записи. NOT NULL требует наличия значения.",
+    question: "Как запретить NULL в названии курса?",
+    options: ["title TEXT NOT NULL", "title TEXT ORDER BY", "title TEXT DESC"],
+    answer: 0,
+    explanation: "Ограничение NOT NULL запрещает отсутствующее значение."
+  },
+  {
+    title: "INSERT, UPDATE, DELETE",
+    time: "15 минут",
+    theory: `
+      <p><b>INSERT INTO</b> добавляет строки.
+      Рекомендуется явно перечислять столбцы:
+      значения VALUES должны соответствовать их порядку.</p>
+      <p><b>UPDATE</b> изменяет данные,
+      а <b>SET</b> задаёт новые значения.
+      WHERE определяет изменяемые строки.</p>
+      <p><b>DELETE FROM</b> удаляет строки.
+      Без WHERE команды UPDATE и DELETE затрагивают все строки таблицы.</p>
+      <p>Для практики используй копию учебной базы.
+      Перед изменением проверь нужные записи запросом SELECT.</p>
+      <h3>Безопасное изменение данных</h3>
+      <p>INSERT INTO добавляет новые строки. Если перечислить столбцы явно, запрос будет понятнее и меньше зависеть от порядка столбцов в схеме. Можно вставить несколько записей одним VALUES с несколькими наборами значений.</p>
+      <p>UPDATE изменяет существующие записи. WHERE определяет строки, которые нужно изменить. DELETE FROM удаляет строки; без WHERE будут затронуты все записи таблицы.</p>
+      <p>Перед UPDATE или DELETE полезно сначала выполнить SELECT с тем же WHERE. В SQLite можно использовать BEGIN TRANSACTION, затем COMMIT для сохранения или ROLLBACK для отмены ещё не зафиксированных изменений.</p>
+      <div class="notice"><b>Запомни:</b> Для учебных заданий на изменение используй копию базы, чтобы не испортить исходные данные.</div>`,
+    example:
+`INSERT INTO students
+(id, name, age, city, grade, group_id)
+VALUES (9, 'Айбек', 20, 'Семей', 85, 2);
+
+UPDATE students
+SET grade = 82
+WHERE id = 2;
+
+DELETE FROM students
+WHERE id = 6;`,
+    note: "DELETE удаляет строки, а DROP TABLE удаляет саму таблицу.",
+    question: "Что делает DELETE FROM students без WHERE?",
+    options: [
+      "Удаляет только первую строку",
+      "Удаляет все строки таблицы",
+      "Удаляет только столбец id"
+    ],
+    answer: 1,
+    explanation: "Без WHERE удаляются все строки, но структура таблицы сохраняется."
+  },
+  {
+    title: "Подзапросы",
+    time: "15 минут",
+    theory: `
+      <p>Подзапрос - запрос внутри другого SQL-запроса.
+      Он записывается в скобках и может использоваться,
+      например, в WHERE или FROM.</p>
+      <p>Подзапрос с AVG возвращает одно значение.
+      Его можно сравнить с оценкой каждого студента.</p>
+      <p>Оператор <b>IN</b> позволяет проверить,
+      входит ли значение в набор результатов подзапроса.</p>
+      <p>Если подзапрос используется как одно значение,
+      убедись, что он возвращает один столбец и одну строку.</p>
+      <h3>Вложенные запросы</h3>
+      <p>Подзапрос может возвращать одно значение, одну строку или множество строк. Например, сравнение grade > (SELECT AVG(grade) FROM students) использует скалярный подзапрос.</p>
+      <p>Подзапрос с IN удобен, если внутренний SELECT возвращает несколько значений: WHERE group_id IN (SELECT id FROM groups WHERE title = 'ИС-101').</p>
+      <p>EXISTS проверяет наличие хотя бы одной строки во вложенном запросе. Коррелированный подзапрос может обращаться к значениям текущей строки внешнего запроса и выполняется логически для каждой такой строки.</p>
+      <div class="notice"><b>Запомни:</b> Если подзапрос должен возвращать одно значение, не подставляй в него несколько столбцов.</div>`,
+    example:
+`SELECT name, grade
+FROM students
+WHERE grade > (
+  SELECT AVG(grade)
+  FROM students
+);`,
+    note: "В примере подзапрос вычисляет среднюю оценку, а внешний запрос выбирает оценки выше неё.",
+    question: "Где находится подзапрос в примере?",
+    options: [
+      "Внутри круглых скобок после >",
+      "После имени столбца name",
+      "В названии таблицы students"
+    ],
+    answer: 0,
+    explanation: "SELECT AVG(grade) FROM students внутри скобок - подзапрос."
+  }
+];
+
+
+
+
+// Дополнительные проверочные вопросы для каждого раздела.
+const extraQuizQuestions = [
+  [],
+  [
+    {
+      "question": "Как выбрать имя и город?",
+      "options": [
+        "SELECT name, city FROM students;",
+        "SELECT name FROM city;",
+        "SELECT students FROM name;"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что делает DISTINCT?",
+      "options": [
+        "Удаляет таблицу",
+        "Убирает повторяющиеся строки результата",
+        "Сортирует строки"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что создаёт AS?",
+      "options": [
+        "Новую базу",
+        "Псевдоним столбца",
+        "Новый индекс"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Изменит ли SELECT grade + 5 исходные оценки?",
+      "options": [
+        "Да",
+        "Нет",
+        "Удалит оценки"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Какой оператор требует оба условия?",
+      "options": [
+        "OR",
+        "AND",
+        "IN"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Включает ли BETWEEN 18 AND 20 число 20?",
+      "options": [
+        "Да",
+        "Нет",
+        "Только в MySQL"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как найти имена, начинающиеся с А?",
+      "options": [
+        "name LIKE 'А%'",
+        "name = 'А%'",
+        "name IN 'А%'"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как проверить наличие значения group_id?",
+      "options": [
+        "group_id = NULL",
+        "group_id IS NOT NULL",
+        "group_id <> NULL"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Какой порядок задаёт ASC?",
+      "options": [
+        "По возрастанию",
+        "По убыванию",
+        "Случайный"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что означает LIMIT 3?",
+      "options": [
+        "Пропустить 3 строки",
+        "Вернуть не более 3 строк",
+        "Отсортировать 3 столбца"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Для чего нужен OFFSET?",
+      "options": [
+        "Пропустить часть строк",
+        "Изменить данные",
+        "Удалить повторы"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как вывести три максимальные оценки?",
+      "options": [
+        "ORDER BY grade ASC LIMIT 3",
+        "ORDER BY grade DESC LIMIT 3",
+        "LIMIT 3 ORDER BY grade"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Что считает COUNT(*)?",
+      "options": [
+        "Все строки",
+        "Только уникальные города",
+        "Сумму оценок"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какая функция ищет минимум?",
+      "options": [
+        "MAX",
+        "MIN",
+        "AVG"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какая функция суммирует оценки?",
+      "options": [
+        "COUNT",
+        "SUM",
+        "DISTINCT"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что вернёт COUNT(*) при отсутствии строк?",
+      "options": [
+        "NULL",
+        "0",
+        "1"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Что делает GROUP BY city?",
+      "options": [
+        "Создаёт таблицу городов",
+        "Объединяет строки по городам",
+        "Удаляет города"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Когда применяется WHERE относительно группировки?",
+      "options": [
+        "До",
+        "После",
+        "Вместо"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как отобрать группы со средним выше 90?",
+      "options": [
+        "WHERE AVG(grade) > 90",
+        "HAVING AVG(grade) > 90",
+        "LIMIT AVG(grade) > 90"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Можно ли группировать по двум столбцам?",
+      "options": [
+        "Да",
+        "Нет",
+        "Только после JOIN"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Как называется условие соединения?",
+      "options": [
+        "ON",
+        "LIMIT",
+        "HAVING"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какой JOIN оставляет только совпавшие строки?",
+      "options": [
+        "LEFT JOIN",
+        "INNER JOIN",
+        "CROSS JOIN"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что хранится в students.group_id?",
+      "options": [
+        "Название города",
+        "Ссылка на группу",
+        "Оценка"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что будет с правыми полями без совпадения при LEFT JOIN?",
+      "options": [
+        "NULL",
+        "0",
+        "Строка удаляется"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Какая команда создаёт таблицу?",
+      "options": [
+        "CREATE TABLE",
+        "INSERT TABLE",
+        "SELECT TABLE"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какой тип подходит для текста в SQLite?",
+      "options": [
+        "TEXT",
+        "INTEGER",
+        "REAL"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что запрещает UNIQUE?",
+      "options": [
+        "NULL",
+        "Повторяющиеся значения",
+        "Все изменения"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какая команда удаляет таблицу целиком?",
+      "options": [
+        "DELETE FROM",
+        "DROP TABLE",
+        "UPDATE"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Что задаёт новые значения при UPDATE?",
+      "options": [
+        "SET",
+        "FROM",
+        "ORDER BY"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что делает INSERT INTO?",
+      "options": [
+        "Добавляет строки",
+        "Сортирует строки",
+        "Создаёт индекс"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как отменить незавершённую транзакцию?",
+      "options": [
+        "COMMIT",
+        "ROLLBACK",
+        "DROP"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что произойдёт при UPDATE без WHERE?",
+      "options": [
+        "Изменятся все строки",
+        "Изменится одна строка",
+        "Ничего"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ],
+  [
+    {
+      "question": "Где может находиться подзапрос?",
+      "options": [
+        "Только после SELECT",
+        "В WHERE или FROM",
+        "Только после ORDER BY"
+      ],
+      "answer": 1,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Какой оператор проверяет наличие строк?",
+      "options": [
+        "EXISTS",
+        "DISTINCT",
+        "OFFSET"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Как проверить вхождение в набор значений?",
+      "options": [
+        "IN",
+        "AS",
+        "DESC"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    },
+    {
+      "question": "Что вычисляет SELECT AVG(grade) FROM students?",
+      "options": [
+        "Среднюю оценку",
+        "Число городов",
+        "Список имён"
+      ],
+      "answer": 0,
+      "explanation": "Разбери соответствующее правило в лекции и сравни варианты."
+    }
+  ]
+];
+lessons.forEach((lesson, index) => {
+  const original = lesson.questions || [{question: lesson.question, options: lesson.options, answer: lesson.answer, explanation: lesson.explanation}];
+  lesson.questions = original.concat(extraQuizQuestions[index]).slice(0, 5);
+});
+
+function readStorage(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value === null ? fallback : value;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    
+  }
+}
+
+function validIndexes(value, length) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.filter(index =>
+    Number.isInteger(index) && index >= 0 && index < length
+  ))];
+}
+
+let completedLessons = validIndexes(
+  readStorage("sql-bilim-lessons-v3", validIndexes(readStorage("sql-bilim-lessons-v2", []), lessons.length).filter(i => i !== 0)),
+  lessons.length
+);
+
+let currentLesson = 0;
+let currentQuestion = 0;
+let questionPassed = false;
+let selectedAnswer = null;
+
+
+function showTab(name) {
+  const theoryVisible = name === "theory";
+  document.getElementById("theoryPanel").classList.toggle("hidden", !theoryVisible);
+  document.getElementById("quizPanel").classList.toggle("hidden", theoryVisible);
+  document.getElementById("theoryTab").classList.toggle("active", theoryVisible);
+  document.getElementById("quizTab").classList.toggle("active", !theoryVisible);
+}
+
+function renderLessonNavigation() {
+  const list = document.getElementById("lessonList");
+  list.replaceChildren();
+
+  lessons.forEach((lesson, index) => {
+    const done = completedLessons.includes(index);
+    const button = document.createElement("button");
+    button.className = "lesson-button" +
+      (currentLesson === index ? " active" : "") +
+      (done ? " done" : "");
+
+    button.setAttribute("aria-current",
+      currentLesson === index ? "step" : "false");
+
+    button.innerHTML = `
+      <span class="lesson-number">${done ? "✓" : index + 1}</span>
+      <span>${lesson.title}<small>${lesson.time}</small></span>
+    `;
+
+    button.addEventListener("click", () => openLesson(index));
+    list.appendChild(button);
+  });
+
+  document.getElementById("lessonProgress").style.width =
+    `${completedLessons.length / lessons.length * 100}%`;
+
+  document.getElementById("lessonProgressText").textContent =
+    `${completedLessons.length} из ${lessons.length} уроков завершено`;
+}
+
+function getLessonQuestions() {
+  const lesson = lessons[currentLesson];
+  return lesson.questions || [lesson];
+}
+
+function renderQuestion() {
+  selectedAnswer = null;
+  questionPassed = false;
+  const questions = getLessonQuestions();
+  const question = questions[currentQuestion];
+  document.getElementById("quizQuestion").textContent =
+    `Вопрос ${currentQuestion + 1} из ${questions.length}. ${question.question}`;
+  const feedback = document.getElementById("quizFeedback");
+  feedback.textContent = "";
+  feedback.className = "";
+  document.getElementById("checkButton").classList.remove("hidden");
+  document.getElementById("nextButton").classList.add("hidden");
+  const options = document.getElementById("quizOptions");
+  options.replaceChildren();
+  question.options.forEach((text, index) => {
+    const button = document.createElement("button");
+    button.className = "option";
+    button.textContent = text;
+    button.setAttribute("aria-pressed", "false");
+    button.onclick = () => {
+      if (questionPassed) return;
+      selectedAnswer = index;
+      options.querySelectorAll("button").forEach((item, i) => {
+        item.classList.toggle("selected", i === index);
+        item.setAttribute("aria-pressed", String(i === index));
+      });
+      feedback.textContent = "";
+      feedback.className = "";
+    };
+    options.appendChild(button);
+  });
+}
+
+function openLesson(index) {
+  currentLesson = index;
+  currentQuestion = 0;
+  const lesson = lessons[index];
+  document.getElementById("lessonLabel").textContent =
+    `УРОК ${index + 1} ИЗ ${lessons.length} · ${lesson.time}`;
+  document.getElementById("lessonTitle").textContent = lesson.title;
+  document.getElementById("lessonTheory").innerHTML = lesson.theory;
+  document.getElementById("lessonExample").textContent = lesson.example;
+  document.getElementById("lessonNote").textContent = lesson.note;
+  document.getElementById("previousButton").disabled = index === 0;
+  renderQuestion();
+  renderLessonNavigation();
+  showTab("theory");
+}
+
+function checkAnswer() {
+  if (questionPassed) return;
+  const feedback = document.getElementById("quizFeedback");
+  if (selectedAnswer === null) {
+    feedback.className = "feedback error";
+    feedback.textContent = "Сначала выбери ответ.";
+    return;
+  }
+  const questions = getLessonQuestions();
+  const question = questions[currentQuestion];
+  if (selectedAnswer !== question.answer) {
+    feedback.className = "feedback error";
+    feedback.textContent = "Пока неверно. Повтори лекцию и попробуй ещё раз.";
+    return;
+  }
+  questionPassed = true;
+  feedback.className = "feedback success";
+  feedback.textContent = "✓ Правильно! " + question.explanation;
+  document.querySelectorAll("#quizOptions button").forEach(button => {
+    button.disabled = true;
+  });
+  const lastQuestion = currentQuestion === questions.length - 1;
+  if (lastQuestion && !completedLessons.includes(currentLesson)) {
+    completedLessons.push(currentLesson);
+    saveStorage("sql-bilim-lessons-v3", completedLessons);
+    renderLessonNavigation();
+  }
+  document.getElementById("checkButton").classList.add("hidden");
+  const next = document.getElementById("nextButton");
+  next.classList.remove("hidden");
+  next.textContent = !lastQuestion ? "Следующий вопрос →"
+    : currentLesson < lessons.length - 1 ? "Следующий урок →" : "Подвести итог ✓";
+}
+
+document.getElementById("theoryTab").onclick = () => showTab("theory");
+document.getElementById("quizTab").onclick = () => showTab("quiz");
+document.getElementById("goQuizButton").onclick = () => showTab("quiz");
+document.getElementById("backTheoryButton").onclick = () => showTab("theory");
+document.getElementById("checkButton").onclick = checkAnswer;
+
+document.getElementById("previousButton").onclick = () => {
+  if (currentLesson > 0) openLesson(currentLesson - 1);
+};
+
+document.getElementById("nextButton").onclick = () => {
+  if (!questionPassed) return;
+  if (currentQuestion < getLessonQuestions().length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else if (currentLesson < lessons.length - 1) {
+    openLesson(currentLesson + 1);
+  } else {
+    const feedback = document.getElementById("quizFeedback");
+    feedback.className = "feedback success";
+    feedback.textContent = completedLessons.length === lessons.length
+      ? "🎉 Все уроки завершены! Переходи к практике."
+      : `Завершено ${completedLessons.length} из ${lessons.length} уроков. Пройди оставшиеся тесты.`;
+    document.getElementById("nextButton").classList.add("hidden");
+  }
+};
+
+document.getElementById("startButton").onclick = () => {
+  const firstIncomplete = lessons.findIndex(
+    (_, index) => !completedLessons.includes(index)
+  );
+  openLesson(firstIncomplete === -1 ? 0 : firstIncomplete);
+  document.getElementById("course").scrollIntoView({ behavior: "smooth" });
+};
+
+
+
+const students = [
+  [
+    1,
+    "Гулниса",
+    19,
+    "Павлодар",
+    100,
+    1
+  ],
+  [
+    2,
+    "Меллстрой",
+    20,
+    "Алматы",
+    52,
+    1
+  ],
+  [
+    3,
+    "Кадыр",
+    19,
+    "Павлодар",
+    87,
+    2
+  ],
+  [
+    4,
+    "Данель",
+    19,
+    "Алматы",
+    94,
+    2
+  ],
+  [
+    5,
+    "Аружан",
+    19,
+    "Алматы",
+    96,
+    1
+  ],
+  [
+    6,
+    "Есенбек",
+    20,
+    "Павлодар",
+    89,
+    2
+  ],
+  [
+    7,
+    "Канатбек",
+    19,
+    "Павлодар",
+    91,
+    null
+  ],
+  [
+    8,
+    "Ақжарқын",
+    18,
+    "Павлодар",
+    85,
+    1
+  ],
+  [
+    9,
+    "Жанара",
+    20,
+    "Астана",
+    78,
+    2
+  ],
+  [
+    10,
+    "Нұрат",
+    19,
+    "Алматы",
+    92,
+    1
+  ],
+  [
+    11,
+    "Самат",
+    20,
+    "Павлодар",
+    83,
+    2
+  ],
+  [
+    12,
+    "Аида",
+    18,
+    "Павлодар",
+    95,
+    1
+  ]
+];
+
+students.forEach(student => {
+  const row = document.createElement("tr");
+  student.forEach(value => {
+    const cell = document.createElement("td");
+    cell.textContent = value === null ? "NULL" : value;
+    row.appendChild(cell);
+  });
+  document.getElementById("studentsTable").appendChild(row);
+});
+
+document.getElementById("setupCode").textContent = "PRAGMA foreign_keys = ON;\nCREATE TABLE groups (id INTEGER PRIMARY KEY, title TEXT NOT NULL);\nCREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, age INTEGER, city TEXT, grade INTEGER, group_id INTEGER REFERENCES groups(id));\nINSERT INTO groups VALUES (1, 'ИС-101'), (2, 'ИС-102'), (3, 'ИС-103');\nINSERT INTO students (id,name,age,city,grade,group_id) VALUES\n(1, 'Гулниса', 19, 'Павлодар', 100, 1),\n(2, 'Меллстрой', 20, 'Алматы', 52, 1),\n(3, 'Кадыр', 19, 'Павлодар', 87, 2),\n(4, 'Данель', 19, 'Алматы', 94, 2),\n(5, 'Аружан', 19, 'Алматы', 96, 1),\n(6, 'Есенбек', 20, 'Павлодар', 89, 2),\n(7, 'Канатбек', 19, 'Павлодар', 91, NULL),\n(8, 'Ақжарқын', 18, 'Павлодар', 85, 1),\n(9, 'Жанара', 20, 'Астана', 78, 2),\n(10, 'Нұрат', 19, 'Алматы', 92, 1),\n(11, 'Дамир', 20, 'Павлодар', 83, 2),\n(12, 'Амина', 18, 'Астана', 95, 1);";
+
+
+
+const tasks = [
+  {
+    "title": "Вывести всех студентов",
+    "level": "Начальный",
+    "text": "Получите все столбцы и все строки таблицы students.",
+    "hint": "Используйте SELECT и звёздочку *.",
+    "solution": "SELECT * FROM students;",
+    "result": "Столбцы: id, name, age, city, grade, group_id. Строк: 12.\n1 | Гулниса | 19 | Павлодар | 100 | 1\n2 | Меллстрой | 20 | Алматы | 52 | 1\n3 | Кадыр | 19 | Павлодар | 87 | 2\n4 | Данель | 19 | Алматы | 94 | 2\n5 | Аружан | 19 | Алматы | 96 | 1\n6 | Есенбек | 20 | Павлодар | 89 | 2\n7 | Канатбек | 19 | Павлодар | 91 | NULL\n8 | Ақжарқын | 18 | Павлодар | 85 | 1\n9 | Жанара | 20 | Астана | 78 | 2\n10 | Нұрат | 19 | Алматы | 92 | 1\n11 | Дамир | 20 | Павлодар | 83 | 2\n12 | Амина | 18 | Астана | 95 | 1"
+  },
+  {
+    "title": "Имена и возраст",
+    "level": "Начальный",
+    "text": "Выведите только имена и возраст студентов.",
+    "hint": "Перечислите name и age через запятую.",
+    "solution": "SELECT name, age FROM students;",
+    "result": "Столбцы: name, age. Строк: 12.\nГулниса | 19\nМеллстрой | 20\nКадыр | 19\nДанель | 19\nАружан | 19\nЕсенбек | 20\nКанатбек | 19\nАқжарқын | 18\nЖанара | 20\nНұрат | 19\nДамир | 20\nАмина | 18"
+  },
+  {
+    "title": "Студенты старше 19 лет",
+    "level": "Начальный",
+    "text": "Найдите студентов, возраст которых строго больше 19.",
+    "hint": "Используйте WHERE age > 19.",
+    "solution": "SELECT * FROM students\nWHERE age > 19;",
+    "result": "Столбцы: id, name, age, city, grade, group_id. Строк: 4.\n2 | Меллстрой | 20 | Алматы | 52 | 1\n6 | Есенбек | 20 | Павлодар | 89 | 2\n9 | Жанара | 20 | Астана | 78 | 2\n11 | Дамир | 20 | Павлодар | 83 | 2"
+  },
+  {
+    "title": "Студенты из Павлодара",
+    "level": "Начальный",
+    "text": "Выведите студентов, у которых city равен Павлодар.",
+    "hint": "Название города нужно записать в одинарных кавычках.",
+    "solution": "SELECT * FROM students\nWHERE city = 'Павлодар';",
+    "result": "Столбцы: id, name, age, city, grade, group_id. Строк: 6.\n1 | Гулниса | 19 | Павлодар | 100 | 1\n3 | Кадыр | 19 | Павлодар | 87 | 2\n6 | Есенбек | 20 | Павлодар | 89 | 2\n7 | Канатбек | 19 | Павлодар | 91 | NULL\n8 | Ақжарқын | 18 | Павлодар | 85 | 1\n11 | Дамир | 20 | Павлодар | 83 | 2"
+  },
+  {
+    "title": "Несколько условий",
+    "level": "Начальный",
+    "text": "Найдите студентов из Астаны с оценкой не ниже 80.",
+    "hint": "Соедините условия с помощью AND.",
+    "solution": "SELECT * FROM students\nWHERE city = 'Астана' AND grade >= 80;",
+    "result": "Столбцы: id, name, age, city, grade, group_id. Строк: 1.\n12 | Аида | 18 | Павлодар | 95 | 1"
+  },
+  {
+    "title": "Сортировка оценок",
+    "level": "Начальный",
+    "text": "Выведите имена и оценки по убыванию оценки.",
+    "hint": "Используйте ORDER BY grade DESC.",
+    "solution": "SELECT name, grade FROM students\nORDER BY grade DESC;",
+    "result": "Столбцы: name, grade. Строк: 12.\nГулниса | 100\nАружан | 96\nАида | 95\nДанель | 94\nОразгүл | 92\nКанатбек | 91\nЕсенбек | 89\nКадыр | 87\nЖанара | 85\nСамат | 83\nТаңбол | 78\nМеллстрой | 52"
+  },
+  {
+    "title": "Три лучших студента",
+    "level": "Средний",
+    "text": "Получите имена и оценки трёх студентов с самыми высокими оценками.",
+    "hint": "Добавьте LIMIT 3 после сортировки.",
+    "solution": "SELECT name, grade FROM students\nORDER BY grade DESC\nLIMIT 3;",
+    "result": "Столбцы: name, grade. Строк: 3.\nГулниса | 100\nАружан | 96\nАида | 95"
+  },
+  {
+    "title": "Города без повторений",
+    "level": "Начальный",
+    "text": "Получите список городов без повторений.",
+    "hint": "Используйте DISTINCT.",
+    "solution": "SELECT DISTINCT city FROM students;",
+    "result": "Столбцы: city. Строк: 3.\nПавлодар\nАлматы\nАстана"
+  },
+  {
+    "title": "Количество студентов",
+    "level": "Начальный",
+    "text": "Посчитайте всех студентов. Назовите столбец total.",
+    "hint": "Используйте COUNT(*) AS total.",
+    "solution": "SELECT COUNT(*) AS total FROM students;",
+    "result": "Столбцы: total. Строк: 1.\n12"
+  },
+  {
+    "title": "Средняя оценка",
+    "level": "Средний",
+    "text": "Вычислите среднюю оценку студентов из Павлодара.",
+    "hint": "Используйте AVG(grade) и фильтр WHERE.",
+    "solution": "SELECT AVG(grade) AS average_grade\nFROM students\nWHERE city = 'Павлодар';",
+    "result": "Столбцы: average_grade. Строк: 1.\n89.167"
+  },
+  {
+    "title": "Количество по городам",
+    "level": "Средний",
+    "text": "Для каждого города выведите количество студентов.",
+    "hint": "Нужны GROUP BY city и COUNT(*).",
+    "solution": "SELECT city, COUNT(*) AS total\nFROM students\nGROUP BY city;",
+    "result": "Столбцы: city, total. Строк: 3.\nАлматы | 4\nАстана | 2\nПавлодар | 6"
+  },
+  {
+    "title": "Города с тремя студентами",
+    "level": "Средний",
+    "text": "Выведите города, в которых живут минимум три студента.",
+    "hint": "После GROUP BY добавьте HAVING COUNT(*) >= 3.",
+    "solution": "SELECT city, COUNT(*) AS total\nFROM students\nGROUP BY city\nHAVING COUNT(*) >= 3;",
+    "result": "Столбцы: city, total. Строк: 2.\nАлматы | 4\nПавлодар | 6"
+  },
+  {
+    "title": "Студенты и группы",
+    "level": "Средний",
+    "text": "Выведите имена студентов и названия их групп. Включите только студентов с существующей группой.",
+    "hint": "Используйте INNER JOIN по students.group_id = groups.id.",
+    "solution": "SELECT s.name, g.title\nFROM students AS s\nINNER JOIN groups AS g\nON s.group_id = g.id;",
+    "result": "Столбцы: name, title. Строк: 11.\nГулниса | ИС-101\nМеллстрой | ИС-101\nКадыр | ИС-102\nДанель | ИС-102\nАружан | ИС-101\nЕсенбек | ИС-102\nАқжарқын | ИС-101\nЖанара | ИС-102\nНұрат | ИС-101\nДамир | ИС-102\nАмина | ИС-101"
+  },
+  {
+    "title": "Сохранить студентов без группы",
+    "level": "Продвинутый",
+    "text": "Выведите имена и названия групп всех студентов, включая студентов без группы.",
+    "hint": "Используйте LEFT JOIN, оставив students слева.",
+    "solution": "SELECT s.name, g.title\nFROM students AS s\nLEFT JOIN groups AS g\nON s.group_id = g.id;",
+    "result": "Столбцы: name, title. Строк: 12.\nГулниса | ИС-101\nМеллстрой | ИС-101\nКадыр | ИС-102\nДанель | ИС-102\nАружан | ИС-101\nЕсенбек | ИС-102\nКанатбек | NULL\nАқжарқын | ИС-101\nЖанара | ИС-102\nНұрат | ИС-101\nДамир | ИС-102\nАмина | ИС-101"
+  },
+  {
+    "title": "Оценка выше средней",
+    "level": "Продвинутый",
+    "text": "Найдите студентов с оценкой выше средней по всей таблице.",
+    "hint": "Сравните grade с подзапросом SELECT AVG(grade).",
+    "solution": "SELECT name, grade\nFROM students\nWHERE grade > (\n  SELECT AVG(grade) FROM students\n);",
+    "result": "Столбцы: name, grade. Строк: 8.\nГулниса | 100\nКадыр | 87\nДанель | 94\nАружан | 96\nЕсенбек | 89\nКанатбек | 91\nНұрат | 92\nАмина | 95"
+  },
+  {
+    "title": "Добавить студента",
+    "level": "Средний",
+    "text": "Добавьте студента: id 13, имя Айбек, возраст 20, город Семей, оценка 85, группа 2.",
+    "hint": "Используйте INSERT INTO со списком столбцов и VALUES.",
+    "solution": "INSERT INTO students\n(id, name, age, city, grade, group_id)\nVALUES (13, 'Айбек', 20, 'Семей', 85, 2);\n\nSELECT * FROM students WHERE id = 13;",
+    "result": "Столбцы: id, name, age, city, grade, group_id. Строк: 1.\n13 | Айбек | 20 | Семей | 85 | 2"
+  },
+  {
+    "title": "Изменить оценку",
+    "level": "Средний",
+    "text": "Измените оценку студента с id = 2 на 82.",
+    "hint": "Используйте UPDATE, SET и WHERE.",
+    "solution": "UPDATE students\nSET grade = 82\nWHERE id = 2;\n\nSELECT name, grade FROM students WHERE id = 2;",
+    "result": "Столбцы: name, grade. Строк: 1.\nМеллстрой | 82"
+  },
+  {
+    "title": "Удалить студента",
+    "level": "Средний",
+    "text": "Удалите запись студента с id = 6.",
+    "hint": "Используйте DELETE FROM с условием WHERE id = 6.",
+    "solution": "DELETE FROM students WHERE id = 6;\n\nSELECT * FROM students WHERE id = 6;",
+    "result": "Запрос не вернул строк."
+  }
+];
+
+let completedTasks = validIndexes(
+  readStorage("sql-bilim-tasks-v2", []),
+  tasks.length
+);
+
+let currentFilter = "Все";
+
+function updatePracticeCounter() {
+  document.getElementById("practiceCounter").textContent =
+    `${completedTasks.length} / ${tasks.length} ВЫПОЛНЕНО`;
+}
+
+function renderFilters() {
+  const filters = document.getElementById("practiceFilters");
+  filters.replaceChildren();
+
+  ["Все", "Начальный", "Средний", "Продвинутый"].forEach(level => {
+    const button = document.createElement("button");
+    const active = currentFilter === level;
+    button.className = "filter" + (active ? " active" : "");
+    button.textContent = level;
+    button.setAttribute("aria-pressed", String(active));
+
+    button.onclick = () => {
+      currentFilter = level;
+      renderFilters();
+      renderTasks();
+    };
+
+    filters.appendChild(button);
+  });
+}
+
+function renderTasks() {
+  const list = document.getElementById("practiceList");
+  list.replaceChildren();
+
+  tasks.forEach((task, index) => {
+    if (currentFilter !== "Все" && currentFilter !== task.level) return;
+
+    const card = document.createElement("article");
+    card.className = "task-card";
+
+    card.innerHTML = `
+      <div class="task-heading">
+        <span class="muted">ЗАДАНИЕ ${index + 1}</span>
+        <span class="level">${task.level}</span>
+      </div>
+      <h3>${task.title}</h3>
+      <p>${task.text}</p>
+
+      <label class="muted" for="task-${index}">Твой SQL-запрос</label>
+      <textarea
+        class="task-editor"
+        id="task-${index}"
+        spellcheck="false"
+        placeholder="Напиши запрос здесь…"></textarea>
+
+      <details>
+        <summary>Подсказка</summary>
+        <p>${task.hint}</p>
+      </details>
+
+      <details>
+        <summary>Пример решения и ожидаемый результат</summary>
+        <pre class="code-block solution"></pre>
+        <p class="expected-result"></p>
+        <p class="muted">Возможны и другие корректные запросы.</p>
+      </details>
+
+      <label class="task-complete">
+        <input type="checkbox">
+        Я выполнил(а) задание и проверил(а) результат
+      </label>
+    `;
+
+    const editor = card.querySelector("textarea");
+    const saved = readStorage(`sql-bilim-code-v2-${index}`, "");
+    editor.value = typeof saved === "string" ? saved : "";
+
+    editor.addEventListener("input", () => {
+      saveStorage(`sql-bilim-code-v2-${index}`, editor.value);
+    });
+
+    card.querySelector(".solution").textContent = task.solution;
+    card.querySelector(".expected-result").textContent =
+      "Ожидаемый результат: " + task.result;
+
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    checkbox.checked = completedTasks.includes(index);
+
+    checkbox.addEventListener("change", () => {
+      completedTasks = completedTasks.filter(item => item !== index);
+      if (checkbox.checked) completedTasks.push(index);
+      saveStorage("sql-bilim-tasks-v2", completedTasks);
+      updatePracticeCounter();
+    });
+
+    list.appendChild(card);
+  });
+
+  updatePracticeCounter();
+}
+
+
+
+openLesson(0);
+renderFilters();
+renderTasks();
+
+// Офлайн-помощник: ответы ограничены текстом лекций и заданиями этого сайта.
+(function initSqlAi(){
+ const panel=document.getElementById('sqlAiPanel'), toggle=document.getElementById('sqlAiToggle');
+ const messages=document.getElementById('sqlAiMessages'), input=document.getElementById('sqlAiInput');
+ function setOpen(open){panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)input.focus();}
+ toggle.addEventListener('click',()=>setOpen(panel.hidden));
+ document.getElementById('sqlAiClose').addEventListener('click',()=>setOpen(false));
+ function plain(html){const el=document.createElement('div');el.innerHTML=html;return (el.textContent||'').replace(/\s+/g,' ').trim();}
+ const stop=new Set('что как это где какой какие каким зачем почему для нужно можно мне ты пожалуйста покажи расскажи объясни про из на по со во ли ли у а и или в к с от до за при есть сделать решить задание практику урок лекцию sql запрос таблица студентов'.split(' '));
+ function words(s){return (s.toLowerCase().replace(/ё/g,'е').match(/[a-zа-яәіңғүұқөһ0-9_*]+/g)||[]).filter(x=>x.length>2&&!stop.has(x));}
+ function score(query,text){const w=words(query),t=text.toLowerCase().replace(/ё/g,'е');return w.reduce((n,x)=>n+(t.includes(x)?(x.length>=5?3:2):0),0);}
+ let context={kind:null,index:null};
+ function taskReply(i,mode='explain'){
+  const t=tasks[i]; context={kind:'task',index:i};
+  if(mode==='hint')return `Задание ${i+1}: ${t.title}\n\nПодсказка: ${t.hint}\nПопробуй написать запрос самостоятельно. Если нужно, попроси показать решение.`;
+  if(mode==='solution')return `Задание ${i+1}: ${t.title}\n\nГотовое решение:\n${t.solution}\n\nОжидаемый результат:\n${t.result||'Смотри результат выполнения в SQLite.'}`;
+  return `Задание ${i+1}: ${t.title}\n\nЧто требуется: ${t.text}\n\nКак подойти: ${t.hint}\n\nПример решения:\n${t.solution}\n\nМожешь спросить «почему так?», «дай подсказку» или «а следующее?»`;
+ }
+ function lessonReply(i){const l=lessons[i];context={kind:'lesson',index:i};return `Урок ${i+1}: ${l.title}\n\n${plain(l.theory).slice(0,2000)}\n\nПример:\n${l.example}\n\n${l.note}`;}
+ function answer(query){
+  const q=query.toLowerCase().replace(/ё/g,'е').trim();
+  if(/^(привет|здравствуй|салем|сәлем|hi)[!?. ]*$/.test(q))return 'Привет! Могу объяснить урок или задание, показать решение и продолжить разговор. Например: «объясни задание 1», затем «а 2?»';
+  if(/(список|все|какие).*(урок|тем)/.test(q))return 'В курсе 10 уроков:\n'+lessons.map((l,i)=>`${i+1}. ${l.title}`).join('\n');
+  if(/(список|все|какие).*(задан|практик)/.test(q))return 'Практические задания:\n'+tasks.map((t,i)=>`${i+1}. ${t.title}`).join('\n');
+  const mode=/(подсказ|намек|намёк)/.test(q)?'hint':/(ответ|решени|готов|код|sql|запрос)/.test(q)?'solution':'explain';
+  const taskNo=q.match(/(?:задани[еяю]|заданье|практик[аеиу]|номер|№)\s*(?:номер|№)?\s*(\d{1,2})\b/);
+  if(taskNo){const i=Number(taskNo[1])-1;return tasks[i]?taskReply(i,mode):`В курсе ${tasks.length} практических заданий. Выбери номер от 1 до ${tasks.length}.`;}
+  const lessonNo=q.match(/(?:урок[ае]?|лекци[яиюи]|тема)\s*№?\s*(\d{1,2})\b/);
+  if(lessonNo){const i=Number(lessonNo[1])-1;return lessons[i]?lessonReply(i):`В курсе ${lessons.length} уроков.`;}
+  // Короткие реплики с номером относятся к последнему обсуждаемому типу материала.
+  const shortNumber=q.match(/^(?:(?:а|ну|тогда|можешь|давай|объясни|расскажи|про|и)\s+)*(?:№\s*)?(\d{1,2})(?:\s*(?:-?е|-?й|ое|ой|ю|ую))?(?:\s+(?:можешь|тоже|пожалуйста|объясни|расскажи|давай|тогда|задание|урок|практику|лекцию))*[?!. ]*$/);
+  if(shortNumber){const i=Number(shortNumber[1])-1;const kind=/(урок|лекци)/.test(q)?'lesson':/(задан|практик)/.test(q)?'task':context.kind;if(kind==='task'&&tasks[i])return taskReply(i,mode);if(kind==='lesson'&&lessons[i])return lessonReply(i);return 'Уточни, пожалуйста: урок или практическое задание '+(i+1)+'?';}
+  if(context.kind!==null){
+   if(/^(а\s+)?(следующ|дальше|другое|следующее|следующий)/.test(q)){const i=context.index+1;return context.kind==='task'?(tasks[i]?taskReply(i):'Это последнее практическое задание.'):(lessons[i]?lessonReply(i):'Это последний урок.');}
+   if(/(подробнее|поподробнее|объясни еще|объясни подробнее|почему так|не понял|не поняла|как это работает|разбери)/.test(q)){
+    if(context.kind==='task'){const t=tasks[context.index];return `Разберём задание ${context.index+1} «${t.title}».\n\nЦель: ${t.text}\n\nПодумай над подсказкой: ${t.hint}\n\nЗапрос:\n${t.solution}\n\n${t.result?'Ожидаемый результат: '+t.result:''}\n\nЕсли непонятна конкретная команда, напиши её название.`;}
+    return lessonReply(context.index);
+   }
+   if(/^(а\s+)?(дай|покажи|можно|хочу|напиши|какой|где|решение|ответ|подсказк)/.test(q)&&/(ответ|решени|код|подсказ|запрос)/.test(q))return context.kind==='task'?taskReply(context.index,mode):lessonReply(context.index);
+  }
+  const isPractice=/(задан|практик|решени|напиши|запрос|код|вывести|найти|получи|посчитай)/.test(q);
+  const taskMatches=tasks.map((t,i)=>({i,n:score(q,t.title+' '+t.text+' '+t.hint)})).sort((a,b)=>b.n-a.n);
+  const lessonMatches=lessons.map((l,i)=>({i,n:score(q,l.title+' '+plain(l.theory))})).sort((a,b)=>b.n-a.n);
+  if(isPractice&&taskMatches[0].n>=3&&(taskMatches[0].n>=lessonMatches[0].n||/задан|практик|решени/.test(q)))return taskReply(taskMatches[0].i,mode);
+  if(lessonMatches[0].n>=3)return lessonReply(lessonMatches[0].i);
+  if(taskMatches[0].n>=3)return taskReply(taskMatches[0].i,mode);
+  return 'Я отвечаю только по материалам SQL Bilim. Спроси, например, «объясни задание 1» или «что такое JOIN?». После ответа можно написать «а 2?», «следующее» или «подробнее».';
+ }
+ function bubble(text,user){const el=document.createElement('div');el.className='ai-bubble '+(user?'ai-user':'ai-bot');el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;}
+ document.getElementById('sqlAiForm').addEventListener('submit',e=>{e.preventDefault();const q=input.value.trim();if(!q)return;bubble(q,true);input.value='';bubble(answer(q),false);});
+})();
+</script>
+
+
+</body>
+</html>
